@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bendita Oferta - Las mejores ofertas de tiendas de conveniencia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- ✅ NUEVO: SDK de autenticación -->
+    <script src="firebase-config.js"></script>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏷️</text></svg>">
+</head>
+<body>
+    <!-- Ticker animado -->
+    <div class="ticker">
+        <span class="ticker-inner">🏷️ BENDITA OFERTA &nbsp;&nbsp;·&nbsp;&nbsp; Las mejores ofertas de OXXO, 7-Eleven, Soriana, Walmart y más &nbsp;&nbsp;·&nbsp;&nbsp; ¡Comparte y ahorra! &nbsp;&nbsp;·&nbsp;&nbsp; 🔥 OFERTAS EN TIEMPO REAL &nbsp;&nbsp;·&nbsp;&nbsp; 💰 AHORRA HASTA 70% &nbsp;&nbsp;·&nbsp;&nbsp; 🛒 TIENDAS DE CONVENIENCIA MX &nbsp;&nbsp;·&nbsp;&nbsp; 🏷️ BENDITA OFERTA &nbsp;&nbsp;·&nbsp;&nbsp; Las mejores ofertas de OXXO, 7-Eleven, Soriana, Walmart y más &nbsp;&nbsp;·&nbsp;&nbsp; ¡Comparte y ahorra! &nbsp;&nbsp;·&nbsp;&nbsp; 🔥 OFERTAS EN TIEMPO REAL &nbsp;&nbsp;·&nbsp;&nbsp; 💰 AHORRA HASTA 70% &nbsp;&nbsp;·&nbsp;&nbsp; 🛒 TIENDAS DE CONVENIENCIA MX</span>
+    </div>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🏷️</span>
+                <span class="logo-text">Bendita<span class="logo-accent">Oferta</span></span>
+            </div>
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar ofertas...">
+            </div>
+            </div>
+            <button class="btn-new-post" id="btnNewPost">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Nueva Oferta
+            </button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Tiendas</h3>
+                <div class="store-filters" id="storeFilters">
+                    <button class="store-pill active" data-store="all">Todas</button>
+                    <button class="store-pill" data-store="oxxo">🏪 OXXO</button>
+                    <button class="store-pill" data-store="7eleven">🛒 7-Eleven</button>
+                    <button class="store-pill" data-store="extra">🏠 Extra</button>
+                    <button class="store-pill" data-store="soriana">🛍️ Soriana</button>
+                    <button class="store-pill" data-store="chedraui">🛒 Chedraui</button>
+                    <button class="store-pill" data-store="walmart">🏬 Walmart</button>
+                    <button class="store-pill" data-store="elektra">📱 Elektra</button>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Tendencias</h3>
+                <div class="trending-list" id="trendingList">
+                    <div class="trending-item">
+                        <span class="trending-rank">1</span>
+                        <span class="trending-tag">#CervezaGratis</span>
+                    </div>
+                    <div class="trending-item">
+                        <span class="trending-rank">2</span>
+                        <span class="trending-tag">#2x1Snacks</span>
+                    </div>
+                    <div class="trending-item">
+                        <span class="trending-rank">3</span>
+                        <span class="trending-tag">#Refrigerados</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section stats-section">
+                <h3 class="sidebar-title">Estadísticas</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalPosts">0</span>
+                        <span class="stat-label">Ofertas</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalComments">0</span>
+                        <span class="stat-label">Comentarios</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="feed" id="feed">
+        </section>
+    </main>
+
+    <!-- Modal Nueva Oferta -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Oferta</h2>
+                <button class="modal-close" id="modalClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6 6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form class="modal-form" id="postForm">
+                <div class="form-group">
+                    <label class="form-label">Tienda</label>
+                    <select class="form-select" id="storeSelect" required>
+                        <option value="">Selecciona una tienda</option>
+                        <option value="oxxo">🏪 OXXO</option>
+                        <option value="7eleven">🛒 7-Eleven</option>
+                        <option value="extra">🏠 Extra</option>
+                        <option value="soriana">🛍️ Soriana</option>
+                        <option value="chedraui">🛒 Chedraui</option>
+                        <option value="walmart">🏬 Walmart</option>
+                        <option value="elektra">📱 Elektra</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Título de la oferta</label>
+                    <input type="text" class="form-input" id="titleInput" placeholder="Ej: 2x1 en cervezas Modelo" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Precio original</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency">$</span>
+                            <input type="number" class="form-input price-input" id="originalPrice" placeholder="0.00" step="0.01" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Precio oferta</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency">$</span>
+                            <input type="number" class="form-input price-input" id="discountPrice" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-textarea" id="descriptionInput" placeholder="Describe los detalles de la oferta..." rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Imagen</label>
+                    <div class="image-upload-zone" id="imageUploadZone">
+                        <input type="file" id="imageInput" accept="image/jpeg,image/png" hidden>
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Arrastra una imagen o haz clic</span>
+                            <span class="upload-hint">JPG o PNG, máx 5MB</span>
+                        </div>
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImg" src="" alt="Preview">
+                            <button type="button" class="remove-image" id="removeImage">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 6 6 18M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Publicar Oferta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-icon">🔍</div>
+        <h3 class="empty-title">No se encontraron ofertas</h3>
+        <p class="empty-text">Sé el primero en compartir una oferta</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
